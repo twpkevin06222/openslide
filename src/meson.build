@@ -53,6 +53,7 @@ openslide_sources = [
   'openslide-decode-tiff.c',
   'openslide-decode-tifflike.c',
   'openslide-decode-xml.c',
+  'openslide-decode-zip.c',
   'openslide-error.c',
   'openslide-file.c',
   'openslide-grid.c',
@@ -70,6 +71,7 @@ openslide_sources = [
   'openslide-vendor-sakura.c',
   'openslide-vendor-synthetic.c',
   'openslide-vendor-trestle.c',
+  'openslide-vendor-precipoint.c',
   'openslide-vendor-ventana.c',
   'openslide-vendor-zeiss.c',
 ]
@@ -89,6 +91,7 @@ libopenslide = library(
     dicom_dep,
     sqlite_dep,
     xml_dep,
+    libzip_dep,
     tiff_dep,
     openjpeg_dep,
     jpeg_dep,

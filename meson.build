@@ -149,12 +149,16 @@ sqlite_dep = dependency(
   'sqlite3',
   version : '>=3.14',
 )
+libzip_dep = dependency(
+  'libzip',
+  version : '>=1.1',
+)
 dicom_dep = dependency(
   'libdicom',
   # avoid 'check' dependency
   default_options : ['tests=false'],
   fallback : ['libdicom', 'libdicom_dep'],
-  version : '>=1.0.0',
+  version : '>=1.2.0',
 )
 valgrind_dep = dependency(
   'valgrind',
