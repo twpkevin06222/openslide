@@ -1,0 +1,28 @@
+#
+# openslide-bin (local VMIC/BIF-patched build)
+#
+# Provides the same interface openslide-python expects from the upstream
+# openslide-bin package: a module-level `libopenslide1` CDLL.  See
+# openslide/lowlevel.py:_load_library() in openslide-python.
+#
+
+from __future__ import annotations
+
+from ctypes import CDLL, cdll
+import importlib.resources as res
+import platform
+
+
+def _load_openslide() -> CDLL:
+    if platform.system() == 'Windows':
+        name = 'libopenslide-1.dll'
+    elif platform.system() == 'Darwin':
+        name = 'libopenslide.1.dylib'
+    else:
+        name = 'libopenslide.so.1'
+    with res.as_file(res.files(__name__).joinpath(name)) as path:
+        return cdll.LoadLibrary(path.as_posix())
+
+
+libopenslide1 = _load_openslide()
+__version__ = '4.0.0+vmic.1'

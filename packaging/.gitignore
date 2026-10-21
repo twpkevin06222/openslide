@@ -1,0 +1,10 @@
+# build-wheel.sh output
+venv/
+build-openslide/
+stage/
+build/
+dist/
+wheelhouse/
+*.egg-info/
+# the built library is copied in here by build-wheel.sh
+openslide_bin/*.so*

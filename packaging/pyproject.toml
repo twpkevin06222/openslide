@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openslide-bin"
+version = "4.0.0+vmic.1"
+description = "Binary build of OpenSlide (local build, patched for PreciPoint VMIC + Ventana BIF/DICOM fixes)"
+requires-python = ">=3.9"
+classifiers = [
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Typing :: Typed",
+]
+
+[tool.setuptools]
+# forced to a platform wheel by setup.py's Distribution override
+packages = ["openslide_bin"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+openslide_bin = ["*.so*", "py.typed"]
