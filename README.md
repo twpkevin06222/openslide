@@ -132,6 +132,36 @@ Installing `openslide-python` on its own will not pull in upstream
 
 [openslide-bin]: https://github.com/openslide/openslide-bin
 
+### Requirements
+
+The wheel is tagged `py3-none-manylinux_2_38_x86_64`, which means:
+
+| | Requirement |
+| --- | --- |
+| Python | **3.10 or newer** (3.9 works, but see below) |
+| OS | **Ubuntu 24.04 LTS or newer** (glibc ≥ 2.38) |
+| Architecture | **x86_64** only |
+
+A single wheel covers every Python 3 minor version — it ships a shared
+library loaded through `ctypes`, not a Python extension module, so there is
+nothing to rebuild per interpreter.  Verified working on Python 3.9, 3.12
+and 3.13 from the same file.
+
+The wheel itself declares `Requires-Python: >=3.9`, but `openslide-python`
+1.4.3 and later require 3.10, so on Python 3.9 pip silently falls back to
+`openslide-python` 1.4.2.  Use **Python 3.10+** unless you specifically
+need 3.9.
+
+On the OS side, `manylinux_2_38` needs glibc ≥ 2.38.  That covers:
+
+- Ubuntu 24.04 LTS and newer (glibc 2.39) — recommended
+- Ubuntu 23.10 (glibc 2.38) — end of life
+- Debian 13 and newer, RHEL/Rocky/Alma 10 and newer
+
+It will **not** install on Ubuntu 22.04 (glibc 2.35), Ubuntu 20.04
+(glibc 2.31), Debian 12 (glibc 2.36), or RHEL 8/9 — pip reports no
+compatible wheel found.  See [Portability](#portability) for options there.
+
 ### Building the wheel
 
 Install the build dependencies listed under [Compiling](#compiling) — on
@@ -182,12 +212,15 @@ $ python -c "import openslide; print(openslide.__library_version__)"
 
 ### Portability
 
-`auditwheel` tags the wheel against the glibc of the machine that built it.
-A build on Ubuntu 24.04 yields `manylinux_2_38`, which installs on
-glibc ≥ 2.38 (Ubuntu 23.10+, Debian 13+, RHEL/Rocky 10+) but **not** on
-Ubuntu 22.04 or RHEL 8/9.  To support older distributions, run the build
-inside a `manylinux_2_28` container, or use the upstream
-[openslide-bin][] tooling, which builds against an EL 8 glibc.
+The glibc floor above is not fixed by this repository — `auditwheel` tags
+the wheel against the glibc of whichever machine built it, and a build on
+Ubuntu 24.04 yields `manylinux_2_38`.  Building on an older distribution
+lowers the floor accordingly.
+
+To support Ubuntu 22.04 or RHEL 8/9, run the build inside a
+`manylinux_2_28` container, or use the upstream [openslide-bin][] tooling,
+which builds against an EL 8 glibc.  Likewise, an `aarch64` wheel requires
+running the build on an `aarch64` machine.
 
 glib, libX11 and a handful of other libraries are deliberately left
 unbundled; the manylinux policy treats them as universally present.
