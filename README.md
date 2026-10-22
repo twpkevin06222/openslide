@@ -214,6 +214,64 @@ $ python -c "import openslide; print(openslide.__library_version__)"
 4.0.0
 ```
 
+### Testing
+
+`packaging/tests/test_openslide_bin.py` checks the installed wheel end to
+end through `openslide-python`.  It downloads one slide per scanner format
+from the [OpenSlide test data][testdata] site, verifies each download
+against the SHA-256 in the site's `index.json`, and then:
+
+- confirms `libopenslide.so.1` is loaded from the `openslide_bin` package
+  rather than a system copy;
+- checks format detection and `openslide.vendor`;
+- compares `openslide.quickhash-1` with the value upstream records in
+  `test/cases/*/config.yaml`, where there is one;
+- reads a level-0 region, the lowest-resolution level, a thumbnail, the
+  associated images, the colour profile and a Deep Zoom tile.
+
+| Format | Slide | Quickhash checked |
+| --- | --- | --- |
+| Aperio | `CMU-1-Small-Region.svs` | yes |
+| DICOM | `JP2K-33003-1.zip` | yes |
+| Generic TIFF | `CMU-1.tiff` | yes |
+| Hamamatsu NDPI | `CMU-1.ndpi` | yes |
+| Hamamatsu VMS | `CMU-1.zip` | yes |
+| Leica | `Leica-1.scn` | yes |
+| MIRAX | `CMU-1-Saved-1_16.zip` | yes |
+| Philips TIFF | `Philips-4.tiff` | yes |
+| Trestle | `CMU-1.zip` | yes |
+| Ventana | `Ventana-1.bif` | no |
+| Zeiss CZI | `Zeiss-5-SlidePreview-Zstd0.czi` | no |
+
+Argos, Huron and Olympus are listed on the site but have no driver in
+OpenSlide 4.0, so they are reported as skipped and not downloaded.
+PreciPoint VMIC has no public test slide and is not covered.
+
+Run it from an environment with the wheel installed:
+
+```
+pip install packaging/wheelhouse/openslide_bin-*.whl openslide-python pytest
+pytest packaging/tests -v
+```
+
+The full set is about 2.3 GB.  Downloads are cached in
+`~/.cache/openslide-testdata` (override with `OPENSLIDE_TESTDATA_DIR`), so
+only the first run pays for them.  To run a quick subset:
+
+```
+pytest packaging/tests -v -k "library or Aperio or Mirax or Zeiss"
+```
+
+If `PYTHONPATH` points at another distribution's site-packages (ROS, for
+example), pytest may try to load that distribution's plugins and fail
+before collecting.  Isolate the run with:
+
+```
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest packaging/tests -v
+```
+
+[testdata]: https://openslide.cs.cmu.edu/download/openslide-testdata/
+
 ### Portability
 
 The glibc floor above is not fixed by this repository — `auditwheel` tags
