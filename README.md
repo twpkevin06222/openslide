@@ -136,6 +136,20 @@ Installing `openslide-python` on its own will not pull in upstream
 
 [openslide-bin]: https://github.com/openslide/openslide-bin
 
+### Credits
+
+The format changes in this branch build on work by others:
+
+- **Ventana BIF (DP 200 support, tile placement)** — based on PathAI's
+  [`dp200-support-with-tests`][pathai-dp200] branch of OpenSlide.
+- **PreciPoint VMIC driver** — based on
+  [openslide-vmic][markus-vmic] by Markus-PP.
+
+Thanks to both for publishing their work.
+
+[pathai-dp200]: https://github.com/Path-AI/openslide/tree/dp200-support-with-tests
+[markus-vmic]: https://github.com/Markus-PP/openslide-vmic
+
 ### Requirements
 
 The wheel is tagged `py3-none-manylinux_2_38_x86_64`, which means:
