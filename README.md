@@ -272,6 +272,39 @@ env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 pytest packaging/tests -v
 
 [testdata]: https://openslide.cs.cmu.edu/download/openslide-testdata/
 
+### Testing in Docker
+
+`packaging/Dockerfile` builds a clean Ubuntu 24.04 image with the system
+Python 3.12, a [uv](https://docs.astral.sh/uv/)-managed venv at `/opt/venv`
+containing the wheel, `openslide-python` and `pytest`, and the test suite.
+It is a check that the wheel works on a machine with nothing else
+installed: the image adds only `libglib2.0-0t64`, `libx11-6`, `libxext6`
+and `libxrender1`, the libraries the wheel deliberately leaves unbundled.
+
+Build the wheel first, then from the repository root:
+
+```
+docker build -t openslide-bin-test packaging
+```
+
+The image's default command runs the tests against `/testdata`.  Mount
+the local slide cache there to skip the downloads; mounting it read-only
+makes sure every slide comes from the cache:
+
+```
+docker run --rm -v ~/.cache/openslide-testdata:/testdata:ro openslide-bin-test
+```
+
+Without the mount the tests download the slides into the container, and
+they are lost when it exits.  Arguments after the image name replace the
+default command, for example:
+
+```
+docker run --rm -v ~/.cache/openslide-testdata:/testdata:ro \
+    openslide-bin-test pytest tests -v -k "Aperio or Ventana"
+docker run --rm -it openslide-bin-test python
+```
+
 ### Portability
 
 The glibc floor above is not fixed by this repository — `auditwheel` tags
